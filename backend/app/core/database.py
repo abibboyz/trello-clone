@@ -1,36 +1,42 @@
 from typing import AsyncGenerator
+from pathlib import Path
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.pool import NullPool
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 
 
 class Settings(BaseSettings):
     """Application settings loaded from .env file"""
+
     database_url: str = Field(
-        default="postgresql+asyncpg://user:password@localhost:5432/trello_db",
+        default="postgresql+asyncpg://postgres:postgres@localhost:5432/trello_db",
         alias="DATABASE_URL"
     )
     sql_echo: bool = Field(default=False, alias="SQL_ECHO")
     environment: str = Field(default="development", alias="ENVIRONMENT")
 
-    class Config:
-        env_file = ".env"
+    model_config = SettingsConfigDict(
+        env_file=Path(__file__).parents[2] / ".env",
+        env_file_encoding="utf-8"
+    )
 
 
-# Load settings
+# Load settings from .env
 settings = Settings()
 
-# Create async engine with SQLAlchemy 2.0
+
+# Create async SQLAlchemy engine
 engine = create_async_engine(
     settings.database_url,
     echo=settings.sql_echo,
-    pool_pre_ping=True,  # Test connections before using them
+    pool_pre_ping=True,
     poolclass=NullPool if settings.environment == "development" else None,
 )
 
-# Create async session factory
+
+# Async session factory
 AsyncSessionLocal = async_sessionmaker(
     engine,
     class_=AsyncSession,
@@ -40,14 +46,14 @@ AsyncSessionLocal = async_sessionmaker(
 )
 
 
-# Base class for all models
+# Base class for ORM models
 class Base(DeclarativeBase):
     pass
 
 
-# Async dependency for FastAPI
+# FastAPI dependency for DB sessions
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    """Get database session for FastAPI dependency injection"""
+    """Provide a database session for FastAPI dependencies"""
     async with AsyncSessionLocal() as session:
         try:
             yield session

@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     """Application settings loaded from .env file"""
 
     database_url: str = Field(
-        default="postgresql+asyncpg://postgres:postgres@localhost:5432/trello_db",
+        default="postgresql+asyncpg://user:password@localhost:5432/trello_db",
         alias="DATABASE_URL"
     )
     sql_echo: bool = Field(default=False, alias="SQL_ECHO")

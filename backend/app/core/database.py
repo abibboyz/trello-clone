@@ -73,3 +73,8 @@ async def drop_tables() -> None:
     """Drop all tables from the database"""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+
+
+# Import all models to register them with Base.metadata
+# This must happen AFTER Base is defined and BEFORE create_tables() is called
+from app.models import Board, List, Card  # noqa: E402, F401

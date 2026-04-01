@@ -4,9 +4,9 @@ from app.routes import boards, lists, cards  # ✅ make sure it's `app`, not `ap
 app = FastAPI()
 
 # include routers
-app.include_router(boards.router, prefix="/boards", tags=["boards"])
-app.include_router(lists.router, prefix="/lists", tags=["lists"])
-app.include_router(cards.router, prefix="/cards", tags=["cards"])
+app.include_router(boards.router)
+app.include_router(lists.router)
+app.include_router(cards.router)
 
 @app.get("/")
 async def root():

@@ -22,7 +22,6 @@ class ListResponse(ListBase):
     id: int
     board_id: int
     created_at: datetime
-    updated_at: datetime
 
     cards: List[CardResponse] = []
 

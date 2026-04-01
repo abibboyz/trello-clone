@@ -9,7 +9,11 @@ from app.service.board_service import create_board, get_boards, get_board
 router = APIRouter(prefix="/boards", tags=["Boards"])
 
 
-@router.post("/", response_model=BoardResponse)
+@router.post(
+    "/",
+    response_model=BoardResponse,
+    responses={400: {"description": "Board title already exists"}},
+)
 async def create_board_route(data: BoardCreate, db: AsyncSession = Depends(get_db)):
     """
     Create a new board.

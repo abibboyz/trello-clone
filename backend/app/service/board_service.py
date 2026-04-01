@@ -1,6 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
+from sqlalchemy.exc import IntegrityError
+from fastapi import HTTPException
 
 from app.models.board import Board
 from app.models.list import List
@@ -11,7 +13,11 @@ async def create_board(db: AsyncSession, data):
     board = Board(**data.model_dump())
 
     db.add(board)
-    await db.commit()
+    try:
+        await db.commit()
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(status_code=400, detail="Board title already exists")
     await db.refresh(board)
 
     return board
@@ -35,7 +41,7 @@ async def get_board(db: AsyncSession, board_id: int):
         select(Board)
         .options(
             selectinload(Board.lists)
-            .selectinload("cards")
+            .selectinload(List.cards)
         )
         .where(Board.id == board_id)
     )

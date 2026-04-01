@@ -1,16 +1,31 @@
+from __future__ import annotations
+
+from pydantic import BaseModel, ConfigDict
+from datetime import datetime
+from typing import List, Optional
+
+from app.schemas.list import ListResponse
+
+
 class BoardBase(BaseModel):
-    title: str = Field(..., max_length=255)
-    description: Optional[str] = Field(None, max_length=1000)
+    title: str
+    description: Optional[str] = None
     is_active: bool = True
+
 
 class BoardCreate(BoardBase):
     pass
 
-class Board(BoardBase):
+
+class BoardResponse(BoardBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     created_at: datetime
     updated_at: datetime
-    # Nested lists which include nested cards
-    lists: list[List] = []
 
-    model_config = ConfigDict(from_attributes=True)
+    lists: List[ListResponse] = []
+
+
+# ✅ REQUIRED
+BoardResponse.model_rebuild()

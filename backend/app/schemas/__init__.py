@@ -1,9 +1,9 @@
-from .board import Board, BoardCreate
-from .list import List, ListCreate
-from .card import Card, CardCreate
+from .board import BoardCreate, BoardResponse
+from .list import ListCreate, ListResponse
+from .card import CardCreate, CardResponse
 
 __all__ = [
-    "Board", "BoardCreate",
-    "List", "ListCreate",
-    "Card", "CardCreate",
+    "BoardCreate", "BoardResponse",
+    "ListCreate", "ListResponse",
+    "CardCreate", "CardResponse",
 ]

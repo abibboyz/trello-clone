@@ -1,20 +1,20 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import Optional
 
 class CardBase(BaseModel):
-    title: str = Field(..., max_length=255)
-    description: Optional[str] = Field(None, max_length=2000)
-    position: int = 0
-    is_completed: bool = False
+    title: str
+    description: Optional[str] = None
+
 
 class CardCreate(CardBase):
     list_id: int
 
-class Card(CardBase):
+
+class CardResponse(CardBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     list_id: int
     created_at: datetime
     updated_at: datetime
-    
-    model_config = ConfigDict(from_attributes=True)

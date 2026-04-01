@@ -1,81 +1,76 @@
 import pytest
 import logging
 from sqlalchemy import text
-from app.core.database import engine, create_tables, Base, AsyncSessionLocal
-from sqlalchemy.orm import selectinload
+from sqlalchemy.ext.asyncio import AsyncSession
+import pytest_asyncio
 
+from app.core.database import engine, Base, AsyncSessionLocal
 
-# Configure logging for tests
 logger = logging.getLogger(__name__)
 
 
+# -----------------------------
+# FIXTURE: DB setup/teardown
+# -----------------------------
+@pytest_asyncio.fixture(scope="function")
+async def db() -> AsyncSession:
+    # Create tables
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+    # Provide session
+    async with AsyncSessionLocal() as session:
+        yield session
+
+    # Drop tables
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        
+        
+# -----------------------------
+# TESTS
+# -----------------------------
+@pytest.mark.asyncio
 class TestDatabase:
     """Database connection and operations tests"""
 
-    @pytest.mark.asyncio
     async def test_connection(self):
-        """Test database connection is working"""
         async with engine.connect() as conn:
             result = await conn.execute(text("SELECT 1"))
-            value = result.scalar()
-            assert value == 1, "Database connection failed"
-            logger.info(f"✅ Database connection successful! Result: {value}")
+            assert result.scalar() == 1
 
-    @pytest.mark.asyncio
-    async def test_connection_with_query(self):
-        """Test database connection with actual query"""
+    async def test_basic_query(self):
         async with engine.connect() as conn:
-            result = await conn.execute(text("SELECT 'Hello' as greeting"))
-            greeting = result.scalar()
-            assert greeting == "Hello", "Query execution failed"
-            logger.info(f"✅ Query execution successful! Result: {greeting}")
+            result = await conn.execute(text("SELECT 'Hello'"))
+            assert result.scalar() == "Hello"
 
-    @pytest.mark.asyncio
-    async def test_create_tables(self):
-        """Test table creation - passes once models are defined"""
-        await create_tables()
-        
-        # Verify tables were created
-        async with engine.connect() as conn:
-            result = await conn.execute(
-                text("""
-                    SELECT table_name FROM information_schema.tables 
-                    WHERE table_schema = 'public'
-                """)
-            )
-            tables = result.scalars().all()
-            
-            if len(tables) == 0:
-                logger.warning("⚠️  No tables found - models not yet defined. Create models in app/models/ to generate tables")
-                pytest.skip("No models defined yet - this test will pass once models are created")
-            else:
-                logger.info(f"✅ Tables created successfully! Tables: {tables}")
-                assert len(tables) > 0, "No tables found in database"
+    async def test_tables_created(self, db: AsyncSession):
+        """
+        Verify tables are registered in SQLAlchemy metadata.
+        """
+        tables = Base.metadata.tables.keys()
+        assert "boards" in tables
+        assert "lists" in tables
+        assert "cards" in tables
+        logger.info(f"✅ Tables registered: {tables}")
 
-    @pytest.mark.asyncio
-    async def test_session_creation(self):
-        """Test async session creation"""
-        async with AsyncSessionLocal() as session:
-            result = await session.execute(text("SELECT 1"))
-            value = result.scalar()
-            assert value == 1, "Session creation failed"
-            logger.info(f"✅ Async session created successfully!")
+    async def test_session_creation(self, db: AsyncSession):
+        """
+        Verify async session works.
+        """
+        result = await db.execute(text("SELECT 1"))
+        assert result.scalar() == 1
 
-    @pytest.mark.asyncio
-    async def test_session_connection_pooling(self):
-        """Test connection pooling with multiple sessions"""
+    async def test_multiple_sessions(self):
+        """
+        Create and test multiple AsyncSessions.
+        """
         sessions = []
-        for i in range(3):
-            session = AsyncSessionLocal()
-            sessions.append(session)
-            result = await session.execute(text("SELECT 1"))
-            value = result.scalar()
-            assert value == 1, f"Session {i} failed"
-            await session.close()
-        
-        logger.info(f"✅ Connection pooling test passed! Created {len(sessions)} sessions")
 
+        for _ in range(3):
+            async with AsyncSessionLocal() as session:
+                result = await session.execute(text("SELECT 1"))
+                assert result.scalar() == 1
+                sessions.append(session)
 
-# Run tests from command line
-if __name__ == "__main__":
-    pytest.main([__file__, "-v", "-s"])
+        logger.info("✅ Multiple session test passed")

@@ -1,16 +1,31 @@
+from __future__ import annotations
+
+from pydantic import BaseModel, ConfigDict
+from datetime import datetime
+from typing import List
+
+# 👇 import AFTER future annotations
+from app.schemas.card import CardResponse
+
+
 class ListBase(BaseModel):
-    title: str = Field(..., max_length=255)
-    position: int = 0
-    is_active: bool = True
+    title: str
+
 
 class ListCreate(ListBase):
     board_id: int
 
-class List(ListBase):
+
+class ListResponse(ListBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     board_id: int
     created_at: datetime
-    # Nested cards for the full JSON response
-    cards: list[Card] = []
+    updated_at: datetime
 
-    model_config = ConfigDict(from_attributes=True)
+    cards: List[CardResponse] = []
+
+
+# ✅ REQUIRED in Pydantic v2 for forward refs
+ListResponse.model_rebuild()

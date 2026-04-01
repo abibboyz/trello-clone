@@ -247,3 +247,14 @@ python -m pytest tests/api_tests -q
 3. Add or update tests in tests/api_tests.
 4. Update README/API notes if behavior changes.
 5. Open a pull request.
+
+## How to --> for beginners learning from this project
+Read main.py once.
+Pick one feature area: boards, lists, or cards.
+Read its route file.
+Trace every called service function.
+Confirm the model relationships used by that service.
+Check the schema that shapes the request and response.
+Run the matching API test file before making changes.
+Change service logic first, then route/schema only if behavior changes.
+Re-run tests and check Swagger at /docs.

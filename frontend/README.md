@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Trello Clone Frontend
 
-## Getting Started
+This frontend is built with Next.js 16 (App Router) and connects to the FastAPI backend in the sibling backend folder.
 
-First, run the development server:
+## Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+1. Node.js 20+.
+2. The FastAPI backend running locally (default: http://127.0.0.1:8000).
+
+## Environment
+
+Create frontend/.env.local with:
+
+```env
+NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+You can also set API_BASE_URL if you want a server-only override.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Run
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+From the frontend directory:
 
-## Learn More
+```bash
+npm install
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open http://localhost:3000.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Routes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. /: Landing page with quick entry to boards.
+2. /boards: Board index (list boards + create board).
+3. /boards/[id]: Board workspace (read board with nested lists/cards + create list + create card).
 
-## Deploy on Vercel
+## Supported Operations (Current Backend Contract)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The UI intentionally matches the currently available FastAPI endpoints.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Boards: create, list, and fetch by id.
+2. Lists: create and read via board payload.
+3. Cards: create and read via board payload.
+
+Not yet supported by backend endpoints:
+
+1. Update/edit board/list/card.
+2. Delete board/list/card.
+3. Reorder operations.
+4. Pagination and server-side filtering.
+
+## Validation and UX
+
+1. Form validation mirrors backend constraints.
+2. Loading, empty, and error states are implemented on boards and board detail routes.
+3. Server Actions are used for create flows to avoid browser CORS issues when backend does not expose CORS middleware.
+
+## Quality Checks
+
+```bash
+npm run lint
+npm run build
+```
+
+## Notes
+
+If backend host/port changes, update NEXT_PUBLIC_API_URL (or API_BASE_URL).
+

@@ -1,26 +1,121 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --canvas: #f4f1e8;
+  --ink: #12110d;
+  --muted: #5a5548;
+  --panel: #fffdf7;
+  --panel-border: #d6cfbf;
+  --accent: #0f766e;
+  --accent-ink: #f5fffd;
+  --danger: #b42318;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-canvas: var(--canvas);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-panel: var(--panel);
+  --color-panel-border: var(--panel-border);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-danger: var(--danger);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  background:
+    radial-gradient(circle at 15% -10%, #efe6d5 0%, transparent 35%),
+    radial-gradient(circle at 100% 10%, #d6e6df 0%, transparent 25%),
+    var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), "Segoe UI", sans-serif;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.hero-panel {
+  background: linear-gradient(130deg, rgba(255, 255, 255, 0.88), rgba(240, 244, 236, 0.9));
+  border: 1px solid rgba(214, 207, 191, 0.95);
+}
+
+.shadow-card {
+  box-shadow:
+    0 18px 40px -28px rgba(18, 17, 13, 0.4),
+    0 4px 14px -8px rgba(18, 17, 13, 0.2);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: 0.7rem 1.2rem;
+  font-weight: 600;
+  transition: transform 180ms ease, filter 180ms ease;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  cursor: not-allowed;
+  filter: grayscale(0.25);
+  opacity: 0.7;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid var(--panel-border);
+  background: var(--panel);
+  color: var(--ink);
+  padding: 0.65rem 1.15rem;
+  font-weight: 600;
+  transition: background-color 180ms ease;
+}
+
+.btn-secondary:hover {
+  background: #f8f4e9;
+}
+
+.input-field {
+  width: 100%;
+  border-radius: 0.8rem;
+  border: 1px solid var(--panel-border);
+  background: #fff;
+  padding: 0.6rem 0.75rem;
+  color: var(--ink);
+}
+
+.input-field:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 55%, white 45%);
+  outline-offset: 1px;
+}
+
+.card-panel {
+  border: 1px solid var(--panel-border);
+  background: var(--panel);
+  border-radius: 1rem;
+}
+
+.error-banner {
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, white 70%);
+  background: color-mix(in srgb, var(--danger) 8%, white 92%);
+  color: var(--danger);
+  padding: 0.6rem 0.75rem;
+}
+
+.success-banner {
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, white 72%);
+  background: color-mix(in srgb, var(--accent) 12%, white 88%);
+  color: color-mix(in srgb, var(--accent) 76%, black 24%);
+  padding: 0.6rem 0.75rem;
 }
